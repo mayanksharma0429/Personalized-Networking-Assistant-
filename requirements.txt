@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+transformers
+torch
+requests
+python-dotenv
+streamlit
+pytest
+httpx
+pytest-cov
+sqlalchemy
