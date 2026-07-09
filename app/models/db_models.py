@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
-from datetime import datetime
+from datetime import datetime, UTC
 
 Base = declarative_base()
 
@@ -28,7 +28,7 @@ class NetworkingSession(Base):
     SessionID = Column(Integer, primary_key=True, index=True)
     UserID = Column(Integer, ForeignKey("user_profile.UserID"), nullable=False)
     EventID = Column(Integer, ForeignKey("event_context.EventID"), nullable=False)
-    SessionTimestamp = Column(DateTime, default=datetime.utcnow)
+    SessionTimestamp = Column(DateTime, default=lambda: datetime.now(UTC))
     
     user = relationship("UserProfile", back_populates="sessions")
     event = relationship("EventContext", back_populates="sessions")
@@ -64,6 +64,6 @@ class LogEntry(Base):
     SessionID = Column(Integer, ForeignKey("networking_session.SessionID"), nullable=True)
     ActionType = Column(String(100), nullable=False)
     PayloadJSON = Column(Text, nullable=True)
-    Timestamp = Column(DateTime, default=datetime.utcnow)
+    Timestamp = Column(DateTime, default=lambda: datetime.now(UTC))
     
     session = relationship("NetworkingSession", back_populates="logs")

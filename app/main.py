@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import conversation
 from fastapi import Depends, HTTPException, Security
+from contextlib import asynccontextmanager
 from fastapi.security.api_key import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
 from dotenv import load_dotenv
@@ -11,11 +12,12 @@ from app.database import init_db
 
 load_dotenv()
 
-app = FastAPI(title="Personalized Networking Assistant")
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
+    yield
+
+app = FastAPI(title="Personalized Networking Assistant", lifespan=lifespan)
 
 # API Key configuration
 API_KEY = os.getenv("API_KEY", "my_super_secret_api_key_123") 

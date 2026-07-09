@@ -6,7 +6,6 @@ import json
 
 # Add parent directory to path so we can import backend modules directly
 sys.path.append(os.path.abspath('..'))
-from app.services.feedback_logger import log_feedback
 
 # Configuration
 BASE_URL = "http://127.0.0.1:8000"
@@ -79,13 +78,13 @@ if "suggestions" in st.session_state and st.session_state.suggestions:
         
         with col1:
             if st.button("👍", key=f'like_{i}'):
-                # Directly using backend logger instead of API
-                log_feedback({"user_id": "anonymous", "rating": "like", "comments": suggestion})
+                headers = {"access_token": "my_super_secret_api_key_123"}
+                requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "like", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
         with col2:
             if st.button("👎", key=f'dislike_{i}'):
-                # Directly using backend logger
-                log_feedback({"user_id": "anonymous", "rating": "dislike", "comments": suggestion})
+                headers = {"access_token": "my_super_secret_api_key_123"}
+                requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "dislike", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
 
 st.markdown('---')
@@ -116,13 +115,10 @@ st.markdown('---')
 # --- History Section ---
 st.header("🕒 Conversation History")
 try:
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r") as f:
-            history = json.load(f)
-            
-        # Slice the five most recent entries and reverse them
-        recent_history = list(reversed(history[-5:]))
-        
+    headers = {"access_token": "my_super_secret_api_key_123"}
+    response = requests.get(f"{BASE_URL}/history", headers=headers)
+    if response.status_code == 200:
+        recent_history = response.json()
         if recent_history:
             for entry in recent_history:
                 data_dict = entry.get('data', {})
@@ -147,13 +143,10 @@ st.markdown('---')
 # --- Feedback History Section ---
 st.header("⭐ Feedback History")
 try:
-    if os.path.exists(FEEDBACK_FILE):
-        with open(FEEDBACK_FILE, "r") as f:
-            feedbacks = json.load(f)
-            
-        # Show up to 10 recent feedback entries
-        recent_feedbacks = list(reversed(feedbacks[-10:]))
-        
+    headers = {"access_token": "my_super_secret_api_key_123"}
+    response = requests.get(f"{BASE_URL}/feedback", headers=headers)
+    if response.status_code == 200:
+        recent_feedbacks = response.json()
         if recent_feedbacks:
             for entry in recent_feedbacks:
                 data = entry.get('feedback', {})

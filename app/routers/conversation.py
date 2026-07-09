@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 import json
 
 from app.database import get_db
-from app.models.db_models import UserProfile, EventContext, NetworkingSession, GeneratedStarter, WikipediaFactCheck
+from app.models.db_models import UserProfile, EventContext, NetworkingSession, GeneratedStarter, WikipediaFactCheck, LogEntry
 from app.models.schemas import (
     EventInput, 
     ConversationRequest, 
@@ -107,3 +107,28 @@ def submit_feedback_endpoint(data: FeedbackRequest, db: Session = Depends(get_db
     }
     log_feedback(feedback_data, db)
     return {"message": "Feedback submitted successfully!"}
+
+@router.get("/history")
+def get_history(db: Session = Depends(get_db)):
+    logs = db.query(LogEntry).filter(LogEntry.ActionType == "Conversation Generated").order_by(LogEntry.Timestamp.desc()).limit(5).all()
+    history = []
+    for log in logs:
+        try:
+            data = json.loads(log.PayloadJSON) if log.PayloadJSON else {}
+            history.append({"data": data, "timestamp": str(log.Timestamp)})
+        except:
+            pass
+    return history
+
+@router.get("/feedback")
+def get_feedback(db: Session = Depends(get_db)):
+    logs = db.query(LogEntry).filter(LogEntry.ActionType == "User Feedback").order_by(LogEntry.Timestamp.desc()).limit(10).all()
+    feedbacks = []
+    for log in logs:
+        try:
+            data = json.loads(log.PayloadJSON) if log.PayloadJSON else {}
+            feedbacks.append({"feedback": data, "timestamp": str(log.Timestamp)})
+        except:
+            pass
+    return feedbacks
+
