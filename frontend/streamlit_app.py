@@ -31,6 +31,16 @@ st.markdown(
         letter-spacing: -0.02em !important;
     }
 
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #07060f !important;
+        border-right: 1px solid rgba(129, 140, 248, 0.1) !important;
+    }
+    
+    section[data-testid="stSidebar"] p {
+        color: #94a3b8;
+    }
+
     /* Card Layouts (Glassmorphic) */
     .custom-card {
         background: rgba(22, 21, 44, 0.6) !important;
@@ -102,12 +112,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Configuration
-BASE_URL = "http://127.0.0.1:8000"
-
-st.title("Personalized Networking Assistant")
-st.write("Generate conversation starters and fact-check topics for your next event!")
-
 # --- Session State Initialization ---
 if "suggestions" not in st.session_state:
     st.session_state.suggestions = []
@@ -115,6 +119,38 @@ if "event_desc" not in st.session_state:
     st.session_state.event_desc = ""
 if "themes" not in st.session_state:
     st.session_state.themes = []
+if "base_url" not in st.session_state:
+    st.session_state.base_url = "http://127.0.0.1:8000"
+if "access_token" not in st.session_state:
+    st.session_state.access_token = "my_super_secret_api_key_123"
+
+# --- Sidebar Configuration ---
+with st.sidebar:
+    st.markdown('<h2 style="font-family:\'Outfit\', sans-serif; display: flex; align-items: center; gap: 10px;">NetAssist</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:0.9rem; margin-bottom: 1.5rem;">Your personalized AI-powered networking assistant to guide you through meetups and conferences.</p>', unsafe_allow_html=True)
+    
+    # Redesigned settings card
+    st.markdown(
+        """
+        <div class="custom-card" style="padding: 1rem !important; border: 1px solid rgba(129, 140, 248, 0.15); margin-bottom: 0.5rem;">
+            <div style="font-weight: 600; font-size: 0.85rem; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                Settings
+            </div>
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem;">
+                Configure connection settings for the local server.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    api_url = st.text_input("Server Address", value=st.session_state.base_url)
+    token = st.text_input("Security Key", value=st.session_state.access_token, type="password")
+    
+    st.session_state.base_url = api_url.strip()
+    st.session_state.access_token = token.strip()
+
+st.title("Personalized Networking Assistant")
+st.write("Generate conversation starters and fact-check topics for your next event!")
 
 # --- Generation Section ---
 st.header("Plan Your Conversations")
@@ -137,9 +173,8 @@ if st.button("Generate Ideas"):
         
         with st.spinner("Analyzing event & generating topics..."):
             try:
-                # The API needs the access token
-                headers = {"access_token": "my_super_secret_api_key_123"}
-                response = requests.post(f"{BASE_URL}/generate-conversation", json=payload, headers=headers)
+                headers = {"access_token": st.session_state.access_token}
+                response = requests.post(f"{st.session_state.base_url}/generate-conversation", json=payload, headers=headers)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -168,13 +203,13 @@ if "suggestions" in st.session_state and st.session_state.suggestions:
         
         with col1:
             if st.button("Helpful", key=f'like_{i}'):
-                headers = {"access_token": "my_super_secret_api_key_123"}
-                requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "like", "comments": suggestion}, headers=headers)
+                headers = {"access_token": st.session_state.access_token}
+                requests.post(f"{st.session_state.base_url}/submit-feedback", json={"user_id": "anonymous", "rating": "like", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
         with col2:
             if st.button("Not Helpful", key=f'dislike_{i}'):
-                headers = {"access_token": "my_super_secret_api_key_123"}
-                requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "dislike", "comments": suggestion}, headers=headers)
+                headers = {"access_token": st.session_state.access_token}
+                requests.post(f"{st.session_state.base_url}/submit-feedback", json={"user_id": "anonymous", "rating": "dislike", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
 
 st.markdown('---')
@@ -187,11 +222,10 @@ if st.button("Search Wikipedia"):
     if fact_query:
         with st.spinner("Checking facts..."):
             try:
-                headers = {"access_token": "my_super_secret_api_key_123"}
-                response = requests.post(f"{BASE_URL}/fact-check", json={"query": fact_query}, headers=headers)
+                headers = {"access_token": st.session_state.access_token}
+                response = requests.post(f"{st.session_state.base_url}/fact-check", json={"query": fact_query}, headers=headers)
                 if response.status_code == 200:
                     data = response.json()
-                    # Render the fact-check result in a green highlighted box
                     st.success(data.get("summary", "No summary found."))
                 else:
                     st.error("Could not retrieve facts.")
@@ -205,8 +239,8 @@ st.markdown('---')
 # --- History Section ---
 st.header("Conversation History")
 try:
-    headers = {"access_token": "my_super_secret_api_key_123"}
-    response = requests.get(f"{BASE_URL}/history", headers=headers)
+    headers = {"access_token": st.session_state.access_token}
+    response = requests.get(f"{st.session_state.base_url}/history", headers=headers)
     if response.status_code == 200:
         recent_history = response.json()
         if recent_history:
@@ -227,31 +261,3 @@ try:
         st.info("No history found.")
 except Exception as e:
     st.error("Could not load history.")
-
-st.markdown('---')
-
-# --- Feedback History Section ---
-st.header("Feedback History")
-try:
-    headers = {"access_token": "my_super_secret_api_key_123"}
-    response = requests.get(f"{BASE_URL}/feedback", headers=headers)
-    if response.status_code == 200:
-        recent_feedbacks = response.json()
-        if recent_feedbacks:
-            for entry in recent_feedbacks:
-                data = entry.get('feedback', {})
-                timestamp = entry.get('timestamp', '')
-                
-                # Ternary expression for visual indicator
-                rating = data.get('rating', '')
-                icon = "Helpful:" if rating == 'like' else "Not Helpful:" if rating == 'dislike' else rating
-                
-                st.markdown(f"{icon} {data.get('comments', 'N/A')}")
-                # Render metadata in a subdued font
-                st.caption(f"Time: {timestamp}")
-        else:
-            st.info("No feedback found.")
-    else:
-        st.info("No feedback found.")
-except Exception as e:
-    st.error("Could not load feedback history.")
