@@ -3,6 +3,60 @@
 ## Introduction
 The Personalized Networking Assistant is an AI-powered web application designed to help professionals prepare for events. It analyzes event descriptions using Natural Language Processing (NLP) to extract themes, generates personalized conversation starters based on user interests, and provides a quick fact-checking tool using Wikipedia.
 
+## Getting Started & Running Locally
+
+Follow these steps to run both the frontend and backend servers on your local machine.
+
+### Prerequisites
+Make sure you have Python 3.10+ installed on your system.
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/mayanksharma0429/Personalized-Networking-Assistant-.git
+cd Personalized-Networking-Assistant-
+```
+
+### 2. Set Up a Virtual Environment
+**On Windows:**
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+```
+**On macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+> [!TIP]
+> **Windows Path Length Issue:** If you encounter `OSError: [WinError 206] The filename or extension is too long` while installing PyTorch on Windows, create your virtual environment in a directory with a shorter path (e.g. `C:\venv_pna`) instead of inside your deep workspace directory:
+> ```powershell
+> python -m venv C:\venv_pna
+> C:\venv_pna\Scripts\activate
+> ```
+
+### 3. Install Dependencies
+Once the virtual environment is activated, run:
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the Backend (FastAPI)
+Start the FastAPI server in a terminal window:
+```bash
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+The backend API documentation will be available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+
+### 5. Run the Frontend (Streamlit)
+Start the Streamlit application in a separate terminal window:
+```bash
+streamlit run frontend/streamlit_app.py --server.port 8501 --server.address 127.0.0.1
+```
+Open your browser and visit **[http://127.0.0.1:8501](http://127.0.0.1:8501)** to start using the assistant.
+
+---
+
 ## Team Roles
 - **Mayank:** Project Leader + Streamlit (Frontend & State Management)
 - **Member 2:** FastAPI Backend (Architecture, Routing, Logging)
