@@ -7,13 +7,103 @@ import json
 # Add parent directory to path so we can import backend modules directly
 sys.path.append(os.path.abspath('..'))
 
+st.set_page_config(page_title="AI Networking Assistant", layout="wide")
+
+# --- Custom Styling (Injected CSS) ---
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    html, body, [data-testid="stAppViewContainer"], .main {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #f8fafc;
+    }
+
+    [data-testid="stAppViewContainer"] {
+        background: radial-gradient(circle at 50% 0%, #17153b 0%, #0a0915 75%) !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Outfit', sans-serif;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em !important;
+    }
+
+    /* Card Layouts (Glassmorphic) */
+    .custom-card {
+        background: rgba(22, 21, 44, 0.6) !important;
+        border: 1px solid rgba(129, 140, 248, 0.1) !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 0.75rem !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .custom-card:hover {
+        transform: translateY(-2px) !important;
+        border-color: rgba(129, 140, 248, 0.3) !important;
+        box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15) !important;
+    }
+
+    .custom-card-header {
+        font-weight: 600;
+        color: #818cf8;
+        margin-bottom: 0.5rem;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    /* Custom form elements styling override */
+    .stTextArea textarea, .stTextInput input {
+        background-color: rgba(10, 9, 21, 0.8) !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(129, 140, 248, 0.15) !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1rem !important;
+        transition: all 0.3s ease !important;
+        font-size: 0.95rem !important;
+    }
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: #818cf8 !important;
+        box-shadow: 0 0 15px rgba(129, 140, 248, 0.2) !important;
+        background-color: rgba(10, 9, 21, 0.95) !important;
+    }
+
+    /* Primary actions buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1.75rem !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 0.03em !important;
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        width: 100%;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 30px rgba(79, 70, 229, 0.5) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    .stButton>button:active {
+        transform: translateY(1px) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Configuration
 BASE_URL = "http://127.0.0.1:8000"
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-HISTORY_FILE = os.path.join(PROJECT_ROOT, "history.json")
-FEEDBACK_FILE = os.path.join(PROJECT_ROOT, "feedback.json")
-
-st.set_page_config(page_title="AI Networking Assistant", layout="wide")
 
 st.title("Personalized Networking Assistant")
 st.write("Generate conversation starters and fact-check topics for your next event!")
