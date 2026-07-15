@@ -13,9 +13,9 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 HISTORY_FILE = os.path.join(PROJECT_ROOT, "history.json")
 FEEDBACK_FILE = os.path.join(PROJECT_ROOT, "feedback.json")
 
-st.set_page_config(page_title="AI Networking Assistant", page_icon="🤝", layout="wide")
+st.set_page_config(page_title="AI Networking Assistant", layout="wide")
 
-st.title("🤝 Personalized Networking Assistant")
+st.title("Personalized Networking Assistant")
 st.write("Generate conversation starters and fact-check topics for your next event!")
 
 # --- Session State Initialization ---
@@ -27,7 +27,7 @@ if "themes" not in st.session_state:
     st.session_state.themes = []
 
 # --- Generation Section ---
-st.header("🎯 Plan Your Conversations")
+st.header("Plan Your Conversations")
 
 event_desc = st.text_area("Event Description", placeholder="e.g., A tech meetup in Bangalore for AI developers.")
 user_interests = st.text_input("Your Interests", placeholder="e.g., AI, marketing, startups (comma separated)")
@@ -74,15 +74,15 @@ if "suggestions" in st.session_state and st.session_state.suggestions:
         st.markdown(f"**{i+1}.** {suggestion}")
         
         # Dynamic responsive layout using st.columns
-        col1, col2, _ = st.columns([1, 1, 10])
+        col1, col2, _ = st.columns([1.5, 1.5, 10])
         
         with col1:
-            if st.button("👍", key=f'like_{i}'):
+            if st.button("Helpful", key=f'like_{i}'):
                 headers = {"access_token": "my_super_secret_api_key_123"}
                 requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "like", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
         with col2:
-            if st.button("👎", key=f'dislike_{i}'):
+            if st.button("Not Helpful", key=f'dislike_{i}'):
                 headers = {"access_token": "my_super_secret_api_key_123"}
                 requests.post(f"{BASE_URL}/submit-feedback", json={"user_id": "anonymous", "rating": "dislike", "comments": suggestion}, headers=headers)
                 st.toast("Feedback saved!")
@@ -90,7 +90,7 @@ if "suggestions" in st.session_state and st.session_state.suggestions:
 st.markdown('---')
 
 # --- Fact Checking Section ---
-st.header("🔍 Quick Fact Check")
+st.header("Quick Fact Check")
 fact_query = st.text_input("Enter a topic to quickly verify before you speak about it:")
 
 if st.button("Search Wikipedia"):
@@ -113,7 +113,7 @@ if st.button("Search Wikipedia"):
 st.markdown('---')
 
 # --- History Section ---
-st.header("🕒 Conversation History")
+st.header("Conversation History")
 try:
     headers = {"access_token": "my_super_secret_api_key_123"}
     response = requests.get(f"{BASE_URL}/history", headers=headers)
@@ -141,7 +141,7 @@ except Exception as e:
 st.markdown('---')
 
 # --- Feedback History Section ---
-st.header("⭐ Feedback History")
+st.header("Feedback History")
 try:
     headers = {"access_token": "my_super_secret_api_key_123"}
     response = requests.get(f"{BASE_URL}/feedback", headers=headers)
@@ -154,7 +154,7 @@ try:
                 
                 # Ternary expression for visual indicator
                 rating = data.get('rating', '')
-                icon = "👍" if rating == 'like' else "👎" if rating == 'dislike' else rating
+                icon = "Helpful:" if rating == 'like' else "Not Helpful:" if rating == 'dislike' else rating
                 
                 st.markdown(f"{icon} {data.get('comments', 'N/A')}")
                 # Render metadata in a subdued font
